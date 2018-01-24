@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Golgi animation</title>
+	<style>
+		@keyframes moveup {
+		  from {
+		    transform: translate(0px,0px);
+		  }
+
+		  to {
+		    transform: translate(0px,-275px);
+		  }
+		}
+		@keyframes scrollup {
+		  from {
+		    transform: translate(0px,0px);
+		  }
+
+		  to {
+		    transform: translate(0px,-1200px);
+		  }
+		}
+		g .cargo {
+			  animation-duration: 5s;
+			  animation-name: moveup;
+			  animation-timing-function: linear;
+			  animation-direction: normal;
+		}
+		g ellipse {
+			  animation-duration: 60s;
+			  animation-timing-function: linear;
+			  animation-name: scrollup;
+			  animation-iteration-count: infinite;
+			  animation-direction: normal;			
+		}
+	</style>
+</head>
+<body style="background: #fefefe">
+<svg id="canvas" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 500 500" width="100%" height="400px">
+  <defs>
+    <filter id="goo" filterUnits="userSpaceOnUse">
+      <feColorMatrix mode="matrix" in="SourceGraphic" values="0 0 0 0 0
+                                                     0 0 0 0 0
+                                                     0 0 0 0 0
+                                                     0 0 0 1 0" result="blacksource"/>
+      <feGaussianBlur in="blacksource" stdDeviation="10" result="blur" />
+      <feColorMatrix mode="matrix" in="blur" values="0 0 0 0 0
+                                                     0 0 0 0 0
+                                                     0 0 0 0 0
+                                                     0 0 0 20 -3" result="contrastup"/>
+
+      <feColorMatrix mode="matrix" in="contrastup" values="0 0 0 0 0.8
+                                                     0 0 0 0 0.8
+                                                     0 0 0 0 0.9
+                                                     0 0 0 1 0" result="googrey"/>
+      <feMorphology operator="dilate" in="googrey" radius="3"/>
+          <feColorMatrix mode="matrix" values="0 0 0 0 0.6
+0 0 0 0 0.6
+0 0 0 0 0.9
+0 0 0 1 0" result="outeroutline"/>
+      <feComposite in2="outeroutline" in="googrey" result="gooback"/>
+      <feComposite in2="gooback" in="SourceGraphic"/>
+  	</filter>
+  </defs>
+	<g id="vesicles" filter="url(#goo)">
+		<ellipse cx="250" cy="-200" rx="250" ry="50" fill="#fefaf6"/>
+		<ellipse cx="250" cy="-100" rx="250" ry="50" fill="#fefaf6"/>
+		<ellipse cx="250" cy="100" rx="250" ry="50" fill="#fefaf6"/>
+		<ellipse cx="250" cy="300" rx="250" ry="50" fill="#fefaf6"/>
+		<ellipse cx="250" cy="500" rx="250" ry="50" fill="#fefaf6"/>
+		<ellipse cx="250" cy="700" rx="250" ry="50" fill="#fefaf6"/>
+		<ellipse cx="250" cy="900" rx="250" ry="50" fill="#fefaf6"/>
+		<ellipse cx="250" cy="1100" rx="250" ry="50" fill="#fefaf6"/>
+		<ellipse cx="250" cy="1300" rx="250" ry="50" fill="#fefaf6"/>
+		<ellipse cx="250" cy="1500" rx="250" ry="50" fill="#fefaf6"/>
+		<ellipse cx="250" cy="1700" rx="250" ry="50" fill="#fefaf6"/>
+		<ellipse cx="250" cy="1900" rx="250" ry="50" fill="#fefaf6"/>
+		<circle class="last" cx="0" cy="0" r="50" fill="#fefaf6"/>
+		<circle class="last" cx="-60" cy="40" r="20" fill="#fefaf6"/>
+	</g>
+</svg>
+<script type="text/javascript">
+
+	// Get point in global SVG space
+	function cursorPoint(evt,svg){
+	  let pt = svg.createSVGPoint();
+	  pt.x = evt.clientX; pt.y = evt.clientY;
+	  return pt.matrixTransform(svg.getScreenCTM().inverse());
+	}
+
+	window.onload = function() {
+		document.getElementById('canvas').addEventListener('click', function(ev) {
+			let svg = this;
+			let loc = cursorPoint(ev,svg);
+			let circ = svg.ownerDocument.createElementNS('http://www.w3.org/2000/svg','circle');
+			circ.setAttribute('cx',loc.x);
+			circ.setAttribute('cy',loc.y);
+			circ.setAttribute('r', 30);
+			circ.setAttribute('fill','#fefaf6');
+			circ.setAttribute('class','cargo');
+			circ.addEventListener('animationend', () => circ.parentNode.removeChild(circ) );
+			svg.getElementById('vesicles').appendChild(circ);
+		},{capture: false});
+	};
+</script>
+</body>
+</html>
